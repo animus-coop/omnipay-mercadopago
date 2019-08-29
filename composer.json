@@ -1,0 +1,31 @@
+{
+  "name": "manuvalle/omnipay-mercadopago",
+  "type": "library",
+  "description": "MercadoPago driver for the Omnipay PHP payment processing library",
+  "keywords": [
+    "omnipay",
+    "mercadopago",
+    "mp",
+    "gateway",
+    "merchant",
+    "pay",
+    "payment",
+    "pagos"
+  ],
+  "homepage": "https://github.com/manuvalle/omnipay-mercadopago",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Manuel Valle",
+      "email": "info@manuvalle.dev"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Omnipay\\MercadoPago\\": "src/"
+    }
+  },
+  "require": {
+    "omnipay/common": "^3.0"
+  }
+}
