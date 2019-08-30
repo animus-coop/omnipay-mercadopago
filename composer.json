@@ -26,6 +26,7 @@
     }
   },
   "require": {
+    "php": "^7.1",
     "omnipay/common": "^3.0"
   }
 }

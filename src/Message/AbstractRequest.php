@@ -79,6 +79,15 @@ abstract class AbstractRequest extends
     }
 
     /**
+     * @param $statusCode
+     * @return bool
+     */
+    public function isResponseSuccess($statusCode)
+    {
+        return $statusCode == 200 || $statusCode == 201;
+    }
+
+    /**
      * @param $value
      * @return mixed
      */

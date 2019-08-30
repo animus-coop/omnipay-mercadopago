@@ -2,28 +2,49 @@
 
 namespace Omnipay\MercadoPago\Message;
 
+use Omnipay\Common\Message\NotificationInterface;
+use Omnipay\Common\Http\ClientInterface;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
+
 class AcceptNotificationRequest extends
-    AbstractRequest
+    AbstractRequest implements
+    NotificationInterface
 {
     /**
-     * @return mixed|null
+     * @var
      */
-    public function getData()
+    protected $data;
+
+    /**
+     * Initialise the data from the server request.
+     */
+    public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest)
     {
-        $topic = $this->httpRequest->query->get('topic');
+        parent::__construct($httpClient, $httpRequest);
+
+        $topic = $httpRequest->query->get('topic');
 
         if ($topic) {
-            $id = $this->httpRequest->query->get('id');
+            $id = $httpRequest->query->get('id');
         }
         else {
-            $id = $this->httpRequest->query->get('merchant_order_id');
+            $id = $httpRequest->query->get('merchant_order_id');
         }
-
-        dd($topic, $id);
 
         switch ($topic) {
             case 'payment':
-                $payment = $this->getPaymentData($id);
+                [
+                    $payment,
+                    $statusCode
+                ] = $this->getPaymentData($id);
+
+                if (!$this->isResponseSuccess($statusCode)) {
+                    return [
+                        $payment,
+                        $statusCode
+                    ];
+                }
+
                 $merchantOrder = $this->getMerchantOrderData($payment->order_id);
                 break;
 
@@ -33,48 +54,80 @@ class AcceptNotificationRequest extends
                 break;
         }
 
-//        $order = $merchantOrder[0];
-//        $statusCode = $merchantOrder[1];
-//        $paidAmount = 0;
-//
-//        foreach ($order->payments as $payment) {
-//            if ($payment['status'] == 'approved') {
-//                $paidAmount += $payment['transaction_amount'];
-//            }
-//        }
-//
-//        if ($paidAmount )
-        ////    // If the payment's transaction amount is equal (or bigger) than the merchant_order's amount you can release your items
-        ////    if($paid_amount >= $merchant_order->total_amount){
-        ////        if (count($merchant_order->shipments)>0) { // The merchant_order has shipments
-        ////            if($merchant_order->shipments[0]->status == "ready_to_ship") {
-        ////                print_r("Totally paid. Print the label and release your item.");
-        ////            }
-        ////        } else { // The merchant_order don't has any shipments
-        ////            print_r("Totally paid. Release your item.");
-        ////        }
-        ////    } else {
-        ////        print_r("Not paid yet. Do not release your item.");
-        ////    }
-        return $merchantOrder;
+        $this->data = $merchantOrder;
     }
 
     /**
-     * @param $data
-     * @return CompleteAcceptPurchaseResponse
+     * @return mixed|null
      */
-    public function sendData($data)
+    public function getData()
     {
-        return $this->createResponse($data);
+        return $this->data;
     }
 
     /**
-     * @param $data
-     * @return CompletePurchaseResponse
+     * @return mixed
      */
-    protected function createResponse($data)
+    public function getTransactionStatus()
     {
-        return $this->response = new CompletePurchaseResponse($this, $data);
+        [
+            $order,
+            $statusCode
+        ] = $this->data;
+
+        if (!$this->isResponseSuccess($statusCode)) {
+            return parent::STATUS_FAILED;
+        }
+
+        $paidAmount = 0;
+
+        foreach ($order->payments as $payment) {
+            if ($payment['status'] == 'approved') {
+                $paidAmount += $payment['transaction_amount'];
+            }
+        }
+
+        if ($paidAmount >= $order->total_amount) {
+            if (count($order->shipments) > 0) {
+                if ($order->shipments[0]->status == "ready_to_ship") {
+                    return parent::STATUS_COMPLETED;
+                }
+            }
+            else {
+                return parent::STATUS_COMPLETED;
+            }
+        }
+
+        return parent::STATUS_PENDING;
+    }
+
+    /**
+     * Gateway Reference
+     *
+     * @return string A reference provided by the gateway to represent this transaction
+     */
+    public function getTransactionReference()
+    {
+        [
+            $order,
+            $statusCode
+        ] = $this->data;
+
+        if (!$this->isResponseSuccess($statusCode)) {
+            return null;
+        }
+
+        return $order->external_reference;
+    }
+
+    /**
+     * Response Message
+     *
+     * @return string A response message from the payment gateway
+     */
+    public function getMessage()
+    {
+        return null;
     }
 
     /**
@@ -83,5 +136,16 @@ class AcceptNotificationRequest extends
     public function getEndpoint()
     {
         return $this->endpoint;
+    }
+
+    /**
+     * Legacy support.
+     *
+     * @param mixed $data ignored
+     * @return $this
+     */
+    public function sendData($data)
+    {
+        return $this;
     }
 }
