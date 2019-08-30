@@ -62,7 +62,7 @@ abstract class AbstractRequest extends
      * @param $id
      * @return array
      */
-    public function getMerchantOrder($id)
+    public function getMerchantOrderData($id)
     {
         $url = $this->getEndpoint() . '/merchant_orders/' . $id . '?access_token=' . $this->getAccessToken();
 
@@ -323,4 +323,5 @@ abstract class AbstractRequest extends
     {
         return $this->getParameter('payer');
     }
+
 }

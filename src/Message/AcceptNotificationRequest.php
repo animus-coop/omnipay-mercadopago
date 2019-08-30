@@ -3,32 +3,23 @@
 namespace Omnipay\MercadoPago\Message;
 
 use Omnipay\Common\Message\NotificationInterface;
-use Omnipay\Common\Http\ClientInterface;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 class AcceptNotificationRequest extends
     AbstractRequest implements
     NotificationInterface
 {
     /**
-     * @var
+     * @return mixed|null
      */
-    protected $data;
-
-    /**
-     * Initialise the data from the server request.
-     */
-    public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest)
+    public function getData()
     {
-        parent::__construct($httpClient, $httpRequest);
-
-        $topic = $httpRequest->query->get('topic');
+        $topic = $this->httpRequest->query->get('topic');
 
         if ($topic) {
-            $id = $httpRequest->query->get('id');
+            $id = $this->httpRequest->query->get('id');
         }
         else {
-            $id = $httpRequest->query->get('merchant_order_id');
+            $id = $this->httpRequest->query->get('merchant_order_id');
         }
 
         switch ($topic) {
@@ -54,15 +45,7 @@ class AcceptNotificationRequest extends
                 break;
         }
 
-        $this->data = $merchantOrder;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getData()
-    {
-        return $this->data;
+        return $merchantOrder;
     }
 
     /**
@@ -73,32 +56,32 @@ class AcceptNotificationRequest extends
         [
             $order,
             $statusCode
-        ] = $this->data;
+        ] = $this->getData();
 
         if (!$this->isResponseSuccess($statusCode)) {
-            return parent::STATUS_FAILED;
+            return NotificationInterface::STATUS_FAILED;
         }
 
         $paidAmount = 0;
 
         foreach ($order->payments as $payment) {
-            if ($payment['status'] == 'approved') {
-                $paidAmount += $payment['transaction_amount'];
+            if ($payment->status == 'approved') {
+                $paidAmount += $payment->transaction_amount;
             }
         }
 
         if ($paidAmount >= $order->total_amount) {
             if (count($order->shipments) > 0) {
                 if ($order->shipments[0]->status == "ready_to_ship") {
-                    return parent::STATUS_COMPLETED;
+                    return NotificationInterface::STATUS_COMPLETED;
                 }
             }
             else {
-                return parent::STATUS_COMPLETED;
+                return NotificationInterface::STATUS_COMPLETED;
             }
         }
 
-        return parent::STATUS_PENDING;
+        return NotificationInterface::STATUS_PENDING;
     }
 
     /**
@@ -111,7 +94,7 @@ class AcceptNotificationRequest extends
         [
             $order,
             $statusCode
-        ] = $this->data;
+        ] = $this->getData();
 
         if (!$this->isResponseSuccess($statusCode)) {
             return null;

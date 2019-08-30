@@ -56,8 +56,8 @@ class SmartCheckoutGateway extends
     /**
      * @return mixed
      */
-    public function acceptNotification()
+    public function acceptNotification(array $parameters = [])
     {
-        return $this->createRequest('\Omnipay\MercadoPago\Message\AcceptNotificationRequest', []);
+        return $this->createRequest('\Omnipay\MercadoPago\Message\AcceptNotificationRequest', $parameters);
     }
 }

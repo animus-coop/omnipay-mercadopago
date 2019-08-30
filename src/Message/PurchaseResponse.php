@@ -30,7 +30,7 @@ class PurchaseResponse extends
      */
     public function isSuccessful()
     {
-        return !isset($this->data->error) && $this->isResponseSuccess($this->statusCode);
+        return !isset($this->data->error) && ($this->statusCode == 200 || $this->statusCode == 201);
     }
 
     /**
