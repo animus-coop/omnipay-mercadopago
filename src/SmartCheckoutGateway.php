@@ -17,6 +17,17 @@ class SmartCheckoutGateway extends
     }
 
     /**
+     * @return array
+     */
+    public function getDefaultParameters()
+    {
+        return [
+            'access_token' => '',
+            'testMode'     => false,
+        ];
+    }
+
+    /**
      * @param $value
      * @return mixed
      */
@@ -37,8 +48,17 @@ class SmartCheckoutGateway extends
      * @param array $parameters
      * @return mixed
      */
-    public function purchase(array $parameters = array())
+    public function purchase(array $parameters = [])
     {
         return $this->createRequest('\Omnipay\MercadoPago\Message\PurchaseRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return mixed
+     */
+    public function acceptNotification(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\MercadoPago\Message\AcceptNotificationRequest', $parameters);
     }
 }
