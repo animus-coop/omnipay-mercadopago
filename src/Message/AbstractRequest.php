@@ -11,6 +11,13 @@ abstract class AbstractRequest extends
      * @var string
      */
     protected $endpoint = 'https://api.mercadopago.com';
+    
+    /**
+     * Test endpoint url.
+     *
+     * @var string
+     */
+    protected $testEndpoint = 'https://api.mercadopago.com';
 
     /**
      * @return mixed

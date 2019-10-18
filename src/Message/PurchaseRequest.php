@@ -96,6 +96,6 @@ class PurchaseRequest extends
      */
     public function getEndpoint()
     {
-        return $this->endpoint . '/checkout/preferences';
+        return ($this->getTestMode() ? $this->testEndpoint : $this->endpoint) . '/checkout/preferences';
     }
 }
