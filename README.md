@@ -9,10 +9,10 @@ processing library for PHP. This package implements MercadoPago support for Omni
 
 ## Installation
 
-Omnipay is installed via [Composer](http://getcomposer.org/). To install, simply require `league/omnipay` and `manuvalle/omnipay-mercadopago` with Composer:
+Omnipay is installed via [Composer](http://getcomposer.org/). To install, simply require `league/omnipay` and `animus-coop/omnipay-mercadopago` with Composer:
 
 ```
-composer require league/omnipay manuvalle/omnipay-mercadopago
+composer require league/omnipay animus-coop/omnipay-mercadopago
 ```
 
 ## Basic Usage
