@@ -1,5 +1,5 @@
 {
-  "name": "manuvalle/omnipay-mercadopago",
+  "name": "animus-coop/omnipay-mercadopago",
   "type": "library",
   "description": "MercadoPago driver for the Omnipay PHP payment processing library",
   "keywords": [
@@ -12,12 +12,12 @@
     "payment",
     "pagos"
   ],
-  "homepage": "https://github.com/manuvalle/omnipay-mercadopago",
+  "homepage": "https://github.com/animus-coop/omnipay-mercadopago",
   "license": "MIT",
   "authors": [
     {
       "name": "Manuel Valle",
-      "email": "info@manuvalle.dev"
+      "email": "manu@animus.com.ar"
     }
   ],
   "autoload": {
